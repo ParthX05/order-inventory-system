@@ -99,7 +99,7 @@ Clean layered architecture.
 
 🛠️ How to Run
 Clone the repository
-git clone https://github.com/ParthX05/order-inventory-system.git
+git clone https://github.com/ParthX05/order-inventory-system/tree/main/order-inventory-service
 Configure MySQL in application.properties
 
 Run:
