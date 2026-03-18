@@ -1,124 +1,138 @@
-🧾 Order & Inventory Management System
-A production-style backend system built using Spring Boot that manages Orders and Inventory with proper transactional integrity, status transitions, and concurrency control.
-This project focuses on writing clean business logic — not just CRUD.
+🧾 Order & Inventory Management System ->
+A production-style backend system built using Spring Boot that manages Orders and Inventory with secure access control, transactional integrity, pagination, and concurrency handling.
+This is not a basic CRUD app — it enforces real-world business rules.
 
-🚀 Tech Stack
+🚀 Tech Stack ->
 Java 17
 Spring Boot
 Spring Data JPA
 Hibernate
 MySQL
+Spring Security (Basic Auth)
 Maven
 REST APIs
 Optimistic Locking (@Version)
 
-📌 Problem Statement
-In real-world systems:
-Orders must follow strict status transitions.
-Inventory must decrease when orders are placed.
-Concurrency must not cause overselling.
-Transactions must rollback if any step fails.
-This system solves all of that properly.
+📌 Core Problems Solved ->
+Prevent unauthorized access to APIs
+Enforce role-based authorization (ADMIN / USER)
+Avoid overselling inventory
+Maintain data consistency with transactions
+Handle large datasets with pagination
+Prevent concurrent update conflicts
 
-🏗️ System Design
-Core Modules
-Order Service
-Inventory Service
-Order Repository
-Inventory Repository
-Global Exception Handling
+🏗️ System Design ->
+Modules
+Order Controller / Service
+Inventory Controller / Service
+Security Configuration
+Global Exception Handler
 
-📦 Features
-1️⃣ Order Creation
-Validates product availability
-Deducts stock
-Saves order inside a single transaction
-Rolls back if inventory update fails
+🔐 Security & Authorization ->
+Authentication
+Implemented using Spring Security (Basic Authentication)
+All endpoints are protected
+Authorization (Role-Based)
+Role	Permissions
+USER	Create orders, view orders
+ADMIN	Manage inventory, update order status, full access
 
-2️⃣ Controlled Order Status Transitions
-Orders follow strict state transitions:
+Example Rules -
+Only ADMIN can:
+Update order status
+Modify inventory
+USER cannot:
+Change order lifecycle
+Access restricted endpoints
+
+📦 Features ->
+1️⃣ Order Creation :
+Validates stock availability
+Deducts inventory
+Executes within a single transaction
+Rolls back on failure
+
+2️⃣ Order Status Workflow :
+Strict transitions enforced:
 CREATED → CONFIRMED → SHIPPED → DELIVERED
 CREATED → CANCELLED
 CONFIRMED → CANCELLED
+Invalid transitions are blocked.
 
-Invalid transitions throw:
-IllegalStateException
-No random status changes allowed.
+3️⃣ Inventory Management :
+Dedicated Inventory Controller
+Stock updates restricted to ADMIN
+Prevents negative stock
 
-3️⃣ Inventory Management
-Stock validation before order placement
-Safe stock deduction
-Prevents negative inventory
+4️⃣ Pagination (Scalable API Design) :
+Large datasets are handled using pagination:
+GET /orders?page=0&size=10
+Reduces memory load
+Improves response time
+Industry-standard API behavior
 
-4️⃣ Transaction Management
+5️⃣ Transaction Management :
 @Transactional ensures atomic operations
-If inventory deduction fails → order is NOT saved
-Data consistency guaranteed
+Order + Inventory updates succeed or fail together
 
-5️⃣ Optimistic Locking
-Using:
+6️⃣ Optimistic Locking :
 @Version
 private Long version;
-Prevents race conditions when multiple users try to modify the same order.
-If concurrent modification occurs:
-OptimisticLockException is thrown
-System prevents silent data corruption
+Prevents race conditions
+Detects concurrent updates
+Avoids silent data corruption
 
-6️⃣ Exception Handling
-Global Exception Handler
-Custom error responses
-Clean REST error structure
+7️⃣ Exception Handling :
+Centralized exception handling
+Clean API error responses
+Prevents stack trace leaks
 
-🧠 Business Logic Highlight
-Instead of allowing free status changes, we defined:
-private static final Map<OrderStatus, Set<OrderStatus>> ALLOWED_TRANSITIONS
-This ensures:
-Clear workflow
-No illegal transitions
-Clean and scalable state management
+🔌 API Overview ->
+Order APIs :
+| Method | Endpoint              | Access |
+| ------ | --------------------- | ------ |
+| POST   | `/orders`             | USER   |
+| GET    | `/orders/{id}`        | USER   |
+| GET    | `/orders` (paginated) | USER   |
+| PUT    | `/orders/{id}/status` | ADMIN  |
+| DELETE | `/orders/{id}`        | ADMIN  |
 
-🔌 API Endpoints
-Order APIs
-Method	Endpoint	Description
-POST	/orders	Create new order
-GET	/orders/{id}	Get order by ID
-PUT	/orders/{id}/status	Update order status
-DELETE	/orders/{id}	Delete order
+Inventory APIs :
+| Method | Endpoint          | Access |
+| ------ | ----------------- | ------ |
+| POST   | `/inventory`      | ADMIN  |
+| PUT    | `/inventory/{id}` | ADMIN  |
+| GET    | `/inventory`      | ADMIN  |
 
-📂 Project Structure
+📂 Project Structure ->
 com.example.orderinventory
 │
 ├── controller
-├── service
-├── repository
+├── dto
 ├── entity
+├── enums
 ├── exception
-└── config
+├── repository
+├── security
+├──service
+└── OrderInventoryServiceApplication
 
-Clean layered architecture.
+🎯 What This Project Demonstrates ->
+Secure backend development using Spring Security
+Role-based access control (RBAC)
+Transaction-safe business logic
+Scalable API design with pagination
+Concurrency handling using optimistic locking
+Clean layered architecture
 
-🛠️ How to Run
-Clone the repository
-git clone https://github.com/ParthX05/order-inventory-system/tree/main/order-inventory-service
-Configure MySQL in application.properties
+📈 Future Improvements ->
+Replace Basic Auth with JWT
+Add refresh tokens
+Add unit & integration testing
+Add Swagger/OpenAPI docs
+Dockerize the application
+Build frontend (React)
 
-Run:
-mvn spring-boot:run
-
-🎯 What This Project Demonstrates
-Real backend architecture
-Transaction management
-Concurrency control
-Clean service-layer logic
-Defensive programming
-REST API design
-This is not just CRUD — it’s business-rule-driven backend development.
-
-📈 Future Improvements
-Add authentication (Spring Security + JWT)
-Add unit & integration tests
-Add Docker support
-
-Add Swagger API documentation
-
-Add frontend client (React)
+👨‍💻 Author ->
+Parth Mehta
+Backend Developer (Java | Spring Boot)
